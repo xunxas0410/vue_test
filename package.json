@@ -39,5 +39,17 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "main": "babel.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xunxas0410/vue_test.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xunxas0410/vue_test/issues"
+  },
+  "homepage": "https://github.com/xunxas0410/vue_test#readme",
+  "description": ""
 }
