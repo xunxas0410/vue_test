@@ -11,9 +11,10 @@
 </template>
 
 <script>
+	import pubsub from 'pubsub-js'
 	import MyHeader from './components/MyHeader'
 	import MyList from './components/MyList'
-	import MyFooter from './components/MyFooter.vue'
+	import MyFooter from './components/MyFooter'
 
 	export default {
 		name:'App',
@@ -35,8 +36,14 @@
 					if(todo.id === id) todo.done = !todo.done
 				})
 			},
+			// 更新一個todo
+			updateTodo(id,title){
+				this.todos.forEach((todo)=>{
+					if(todo.id === id) todo.title = title
+				})
+			},
 			//删除一个todo
-			deleteTodo(id){
+			deleteTodo(_,id){
 				this.todos = this.todos.filter( todo => todo.id !== id )
 			},
 			//全选or取消全选
@@ -44,7 +51,7 @@
 				this.todos.forEach((todo)=>{
 					todo.done = done
 				})
-			},
+			},			
 			//清除所有已经完成的todo
 			clearAllTodo(){
 				this.todos = this.todos.filter((todo)=>{
@@ -62,11 +69,13 @@
     },
 	mounted() {
 		this.$bus.$on('checkTodo',this.checkTodo)
-		this.$bus.$on('deleteTodo',this.deleteTodo)
+		this.$bus.$on('updateTodo',this.updateTodo)
+		this.pubId = pubsub.subscribe('deleteTodo',this.deleteTodo)
 	},
 	beforeDestroy() {
 		this.$bus.$off('checkTodo')
-		this.$bus.$off('deleteTodo')
+		this.$bus.$off('updateTodo')
+		pubsub.unsubscribe(this.pubId)
 	},
 	}
 </script>
@@ -92,6 +101,12 @@
 		color: #fff;
 		background-color: #da4f49;
 		border: 1px solid #bd362f;
+	}
+	.btn-edit {
+		color: #fff;
+		background-color: skyblue;
+		border: 1px solid rgb(103, 159, 180);
+		margin-right: 5px;
 	}
 	.btn-danger:hover {
 		color: #fff;

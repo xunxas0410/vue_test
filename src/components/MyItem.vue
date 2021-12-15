@@ -4,13 +4,20 @@
 			<input type="checkbox" :checked="todo.done" @change="handleCheck(todo.id)"/>
 			<!-- 如下代码也能实现功能，但是不太推荐，因为有点违反原则，因为修改了props -->
 			<!-- <input type="checkbox" v-model="todo.done"/> -->
-			<span>{{todo.title}}</span>
-		</label>
+			<span v-show="!todo.isEdit">{{todo.title}}</span>
+			<input 
+			type="text" 
+			v-show="todo.isEdit" 			
+			:value="todo.title" 
+			@blur="handleBlur(todo,$event)">
+		</label>		
 		<button class="btn btn-danger" @click="handleDelete(todo.id)">删除</button>
+		<button v-show="!todo.isEdit" class="btn btn-edit" @click="handleEdit(todo)">編輯</button>
 	</li>
 </template>
 
 <script>
+	import pubsub from 'pubsub-js'
 	export default {
 		name:'MyItem',
 		//声明接收todo
@@ -27,8 +34,23 @@
 				if(confirm('确定删除吗？')){
 					//通知App组件将对应的todo对象删除
 					// this.deleteTodo(id)
-					this.$bus.$emit('deleteTodo',id)
+					// this.$bus.$emit('deleteTodo',id)
+					pubsub.publish('deleteTodo',id)
 				}
+			},
+			// 編輯
+			handleEdit(todo){
+				if(todo.hasOwnProperty.call('isEdit')){
+					todo.isEdit = true
+				}else{
+					this.$set(todo,'isEdit',true)
+				}
+			},
+			// 失去焦點回調(真正執行修改邏緝)
+			handleBlur(todo,e){
+				todo.isEdit = false
+				if(!e.target.value.trim()) return alert('輸入不能為空! ')
+				this.$bus.$emit('updateTodo',todo.id,e.target.value)
 			}
 		},
 	}
